@@ -65,6 +65,10 @@ flutter:
   - assets/journal.svg
   - assets/library.svg
   - assets/newspaper.svg
+  - assets/profile.svg
+  - assets/like.svg
+  - assets/heart.svg
+  - assets/catalog.svg
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

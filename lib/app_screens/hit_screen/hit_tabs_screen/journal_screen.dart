@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:sql_project_part3/Model/Author.dart';
 import 'package:sql_project_part3/Model/Genre.dart';
+import 'package:sql_project_part3/Model/Journal.dart';
 import 'package:sql_project_part3/Model/Publisher.dart';
 import 'package:sql_project_part3/Model/book.dart';
 
@@ -17,37 +18,20 @@ class JournalScreen extends StatefulWidget {
 }
 
 class _JournalScreenState extends State<JournalScreen> {
-  Future<List<Book>> fetchAlbum() async {
+  Future<List<Journal>> fetchAlbum() async {
     photo.initPhoto();
     var datas = await http
-        .get(
-            Uri.parse('http://10.0.2.2:9514/api/printed-product/get/all/books'))
+        .get(Uri.parse(
+            'http://10.0.2.2:9514/api/printed-product/get/all/journals'))
         .timeout(Duration(seconds: 5));
     var jsonData = json.decode(datas.body);
-    List<Book> books = [];
+    List<Journal> journals = [];
 
     for (var u in jsonData) {
-      List<Genre> genres = [];
-
-      for (var s in u['genres']) {
-        genres.add(new Genre(name: s['name']));
-      }
-
-      Book book = Book(
-          volumesNumber: u['volumesNumber'],
-          bookId: u['bookId'],
+      Journal journal = Journal(
           printedProductId: u['printedProductId'],
-          author: new Author(
-              about: u['author']['about'],
-              birthDate: u['author']['birthDate'],
-              surname: u['author']['surname'],
-              name: u['author']['name'],
-              authorId: u['author']['authorId'],
-              pseudonym: u['author']['pseudonym']),
-          genres: genres,
-          bookName: u['name'],
+          genres: new Genre(name: u['name']),
           publicationDate: u['publicationDate'],
-
           publisher: new Publisher(
             publisherId: u['publisher']['publisherId'],
             name: u['publisher']['name'],
@@ -55,29 +39,33 @@ class _JournalScreenState extends State<JournalScreen> {
             phone: u['publisher']['phone'],
             foundationDate: u['publisher']['foundationDate'],
           ),
-
           serialNumber: u['serialNumber'],
           pagesNumber: u['pagesNumber'],
-          annotation: u['annotation'], photo: photo.imagePhoto[rng.nextInt(photo.imagePhoto.length)]);
+          annotation: u['annotation'],
+          photo: photo.imagePhoto[rng.nextInt(photo.imagePhoto.length)],
+          journalName: u['name'],
+          journalId: u['journalId']);
 
-      books.add(book);
+      journals.add(journal);
     }
-    print(books.length);
-    return books;
+    print(journals.length);
+    return journals;
   }
 
-  void onTap() {
-    print('pidr');
+  void onTap(int journal_id) async {
+    List<Journal> journals = await fetchAlbum();
+    Navigator.of(context).pushNamed('/main_screen/journal_details',
+        arguments: {'book_id': journal_id, 'list': journals});
+    print(journal_id);
   }
 
   Photo photo = new Photo();
   var rng = new Random();
   @override
   Widget build(BuildContext context) {
-
     return FutureBuilder(
         future: fetchAlbum(),
-        builder: (BuildContext context, AsyncSnapshot<List<Book>> snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<List<Journal>> snapshot) {
           if (snapshot.data == null) {
             return Center(child: CircularProgressIndicator());
           } else {
@@ -102,7 +90,8 @@ class _JournalScreenState extends State<JournalScreen> {
                               Container(
                                 decoration: BoxDecoration(
                                     image: DecorationImage(
-                                        image: NetworkImage(snapshot.data![index].photo),
+                                        image: NetworkImage(
+                                            snapshot.data![index].photo),
                                         fit: BoxFit.cover)),
                                 width: double.infinity,
                                 height: 150,
@@ -114,15 +103,16 @@ class _JournalScreenState extends State<JournalScreen> {
                                     height: 7,
                                   ),
                                   Text(
-                                    snapshot.data![index].author.name,
+                                    snapshot.data![index].publisher.name,
                                     style: TextStyle(
+                                        overflow: TextOverflow.ellipsis,
                                         fontSize: 18,
                                         fontWeight: FontWeight.w500),
                                   ),
                                   SizedBox(
                                     height: 7,
                                   ),
-                                  Text(snapshot.data![index].bookName),
+                                  Text(snapshot.data![index].journalName),
                                 ],
                               ),
                             ],
@@ -131,7 +121,8 @@ class _JournalScreenState extends State<JournalScreen> {
                             color: Colors.transparent,
                             borderRadius: BorderRadius.circular(10),
                             child: InkWell(
-                              onTap: () => onTap(),
+                              onTap: () =>
+                                  onTap(snapshot.data![index].journalId),
                             ),
                           ),
                         ]),

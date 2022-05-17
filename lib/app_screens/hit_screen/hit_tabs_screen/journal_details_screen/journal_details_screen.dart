@@ -1,39 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:sql_project_part3/Model/Journal.dart';
 import 'package:sql_project_part3/Model/Like.dart';
-import 'package:sql_project_part3/Model/book.dart';
 
-class BookDetailsScreen extends StatefulWidget {
-  final List<Book> list;
-  final book_id;
-  const BookDetailsScreen({Key? key, required this.book_id, required this.list})
+
+class JournalDetailsScreen extends StatefulWidget {
+  final journal_id;
+  final List<Journal> list;
+
+  const JournalDetailsScreen(
+      {Key? key, required this.journal_id, required this.list})
       : super(key: key);
 
   @override
-  _BookDetailsScreenState createState() => _BookDetailsScreenState();
+  _JournalDetailsScreenState createState() => _JournalDetailsScreenState();
 }
 
-class _BookDetailsScreenState extends State<BookDetailsScreen> {
-  List<Book> listDetail = [];
+class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
+  List<Journal> listDetail = [];
   void init() {
     for (int i = 0; i < widget.list.length; ++i) {
-      if (widget.list[i].bookId == widget.book_id) {
+      if (widget.list[i].journalId == widget.journal_id) {
         listDetail.add(widget.list[i]);
       }
     }
   }
 
   late Color _buttonColor;
-  @override
-  void initState() {
-    init();
-    _buttonColor = Colors.white;
-    // TODO: implement initState
-    super.initState();
-  }
-
   void pressButton() {
-    Like.listForBook.add((listDetail[0]));
+    Like.listForJournal.add((listDetail[0]));
     setState(() {
       if (_buttonColor == Colors.white) {
         _buttonColor = Colors.black54;
@@ -41,6 +36,14 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
         _buttonColor = Colors.white;
       }
     });
+  }
+
+  @override
+  void initState() {
+    _buttonColor = Colors.white;
+    init();
+    // TODO: implement initState
+    super.initState();
   }
 
   @override
@@ -52,7 +55,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
           preferredSize: Size.fromHeight(100),
           child: Row(
             children: [
-              Expanded(child: Text(listDetail[0].bookName)),
+              Expanded(child: Text(listDetail[0].journalName)),
               IconButton(
                   onPressed: () {
                     pressButton();
@@ -91,7 +94,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            listDetail[index].bookName,
+                            listDetail[index].journalName,
                             style: TextStyle(
                                 fontSize: 25, fontWeight: FontWeight.w500),
                           ),
@@ -99,9 +102,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                             height: 15,
                           ),
                           Text(
-                            listDetail[index].author.name +
-                                " " +
-                                listDetail[index].author.surname,
+                            listDetail[index].publisher.name,
                             style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w500,
@@ -146,79 +147,6 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                   height: 20,
                 ),
                 ExpansionTile(
-                  title: Text('Author', style: TextStyle(fontSize: 17)),
-                  subtitle: Text(
-                    'Information About author',
-                    style: TextStyle(fontSize: 14),
-                  ),
-                  // Contents
-                  children: [
-                    ListTile(
-                        title: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Text('Name : '),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Text('Surname : '),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Text('Pseudonym : '),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Text('BirthDate : '),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                              ],
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Text(listDetail[index].author.name),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Text(listDetail[index].author.surname),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Text(listDetail[index].author.pseudonym),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Text(listDetail[index].author.birthDate),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        Text('About Author : '),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Text(
-                          listDetail[index].author.about,
-                          maxLines: 10,
-                          overflow: TextOverflow.ellipsis,
-                        )
-                      ],
-                    )),
-                  ],
-                ),
-                ExpansionTile(
                   title: Text('Publisher', style: TextStyle(fontSize: 17)),
                   subtitle: Text(
                     'Information about publisher',
@@ -259,7 +187,13 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                Text(listDetail[index].publisher.name),
+                                Text(
+                                  listDetail[index].publisher.name,
+                                  style: TextStyle(
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  maxLines: 2,
+                                ),
                                 SizedBox(
                                   height: 10,
                                 ),
@@ -281,9 +215,9 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                                     .publisherId
                                     .toString())
                               ],
-                            ),
+                            )
                           ],
-                        ),
+                        )
                       ],
                     )),
                   ],

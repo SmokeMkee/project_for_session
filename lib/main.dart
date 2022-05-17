@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:sql_project_part3/Model/Journal.dart';
+import 'package:sql_project_part3/Model/Newspaper.dart';
 import 'package:sql_project_part3/app_screens/hit_screen/hit_tabs_screen/book_details_screen/book_detal_screen.dart';
+import 'package:sql_project_part3/app_screens/hit_screen/hit_tabs_screen/journal_details_screen/journal_details_screen.dart';
 
 import 'Model/book.dart';
+import 'app_screens/hit_screen/hit_tabs_screen/newspaper_details_screen/newspaper_screen.dart';
 import 'navigation_bar/nav_bar.dart';
 
 void main() {
@@ -30,13 +34,53 @@ class MyApp extends StatelessWidget {
         routes: {
           '/main_screen': (context) => NavBar(),
           '/main_screen/book_details': (context) {
-            final test = ModalRoute.of(context)!.settings.arguments as Map<String , Object>;
+            final map = ModalRoute.of(context)!.settings.arguments
+                as Map<String, Object>;
 
-                return BookDetailsScreen(book_id: test['book_id'] as int, list:test['list'] as  List<Book>,);
+            return BookDetailsScreen(
+              book_id: map['book_id'] as int,
+              list: map['list'] as List<Book>,
+            );
+          },
+          '/main_screen/journal_details': (context) {
+            final map = ModalRoute.of(context)!.settings.arguments
+                as Map<String, Object>;
+
+            return JournalDetailsScreen(
+                journal_id: map['book_id'] as int,
+                list: map['list'] as List<Journal>);
+          },
+          '/main_screen/newspaper_details': (context) {
+            final map = ModalRoute.of(context)!.settings.arguments
+                as Map<String, Object>;
+
+            return NewspaperDetailsScreen(
+              newspaper_id: map['book_id'] as int,
+                list: map['list'] as List<Newspaper>);
+          },
+          '/main_screen/like_screen/book_details' : (context){
+            final map = ModalRoute.of(context)!.settings.arguments
+            as Map<String, Object>;
+            return BookDetailsScreen(
+              book_id: map['book_id'] as int,
+              list: map['list'] as List<Book>,
+            );
+          },
+          '/main_screen/like_screen/journal_details' : (context){
+            final map = ModalRoute.of(context)!.settings.arguments
+            as Map<String, Object>;
+            return JournalDetailsScreen(
+              journal_id: map['journal_id'] as int,
+              list: map['list'] as List<Journal>,
+            );
+          },
+          '/main_screen/like_screen/newspaper_details' : (context){
+            final map = ModalRoute.of(context)!.settings.arguments
+            as Map<String, Object>;
+            return NewspaperDetailsScreen(
+                newspaper_id: map['newspaper_id'] as int,
+                list: map['list'] as List<Newspaper>);
           }
-
-
-
         },
         initialRoute: '/main_screen');
   }

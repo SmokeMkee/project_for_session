@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:sql_project_part3/Model/Author.dart';
 import 'package:sql_project_part3/Model/Genre.dart';
+import 'package:sql_project_part3/Model/Newspaper.dart';
 import 'package:sql_project_part3/Model/Publisher.dart';
 import 'package:sql_project_part3/Model/book.dart';
 import 'package:sql_project_part3/app_screens/hit_screen/hit_tabs_screen/Photos.dart';
@@ -20,14 +21,14 @@ class _NewsPapers_ScreenState extends State<NewsPapers_Screen> {
   var rng = new Random();
 
   
-  Future<List<Book>> fetchAlbum() async {
+  Future<List<Newspaper>> fetchAlbum() async {
     photo.initPhoto();
     var datas = await http
         .get(
-        Uri.parse('http://10.0.2.2:9514/api/printed-product/get/all/books'))
+        Uri.parse('http://10.0.2.2:9514/api/printed-product/get/all/newspapers'))
         .timeout(Duration(seconds: 5));
     var jsonData = json.decode(datas.body);
-    List<Book> books = [];
+    List<Newspaper> newspapers = [];
 
     for (var u in jsonData) {
       List<Genre> genres = [];
@@ -36,19 +37,11 @@ class _NewsPapers_ScreenState extends State<NewsPapers_Screen> {
         genres.add(new Genre(name: s['name']));
       }
 
-      Book book = Book(
-          volumesNumber: u['volumesNumber'],
-          bookId: u['bookId'],
+      Newspaper newspaper = Newspaper(
+          newspaperId: u['newspaperId'],
           printedProductId: u['printedProductId'],
-          author: new Author(
-              about: u['author']['about'],
-              birthDate: u['author']['birthDate'],
-              surname: u['author']['surname'],
-              name: u['author']['name'],
-              authorId: u['author']['authorId'],
-              pseudonym: u['author']['pseudonym']),
           genres: genres,
-          bookName: u['name'],
+          newsPaperName: u['name'],
           publicationDate: u['publicationDate'],
 
           publisher: new Publisher(
@@ -63,14 +56,16 @@ class _NewsPapers_ScreenState extends State<NewsPapers_Screen> {
           pagesNumber: u['pagesNumber'],
           annotation: u['annotation'], photo: photo.imagePhoto[rng.nextInt(photo.imagePhoto.length)]);
 
-      books.add(book);
+      newspapers.add(newspaper);
     }
-    print(books.length);
-    return books;
+    print(newspapers.length);
+    return newspapers;
   }
 
-  void onTap() {
-    print('pidr');
+  void onTap(int newspaperId) async {
+    List<Newspaper> newspaper = await fetchAlbum();
+    Navigator.of(context).pushNamed('/main_screen/newspaper_details',
+        arguments: {'book_id': newspaperId, 'list': newspaper});
   }
 
   @override
@@ -78,7 +73,7 @@ class _NewsPapers_ScreenState extends State<NewsPapers_Screen> {
 
     return FutureBuilder(
         future: fetchAlbum(),
-        builder: (BuildContext context, AsyncSnapshot<List<Book>> snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<List<Newspaper>> snapshot) {
           if (snapshot.data == null) {
             return Center(
                 child: CircularProgressIndicator()
@@ -90,7 +85,7 @@ class _NewsPapers_ScreenState extends State<NewsPapers_Screen> {
                     gridDelegate:
                     const SliverGridDelegateWithMaxCrossAxisExtent(
                       maxCrossAxisExtent: 300,
-                      mainAxisExtent: 250,
+                      mainAxisExtent: 270,
                       childAspectRatio: 3 / 2,
                     ),
                     itemCount: snapshot.data!.length,
@@ -117,15 +112,16 @@ class _NewsPapers_ScreenState extends State<NewsPapers_Screen> {
                                     height: 7,
                                   ),
                                   Text(
-                                    snapshot.data![index].author.name,
+                                    snapshot.data![index].publisher.name,
                                     style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w500),
+                                    maxLines: 2,
                                   ),
                                   SizedBox(
                                     height: 7,
                                   ),
-                                  Text(snapshot.data![index].bookName),
+                                  Text(snapshot.data![index].newsPaperName),
                                 ],
                               ),
                             ],
@@ -134,7 +130,7 @@ class _NewsPapers_ScreenState extends State<NewsPapers_Screen> {
                             color: Colors.transparent,
                             borderRadius: BorderRadius.circular(10),
                             child: InkWell(
-                              onTap: () => onTap(),
+                              onTap: () => onTap(snapshot.data![index].newspaperId),
                             ),
                           ),
                         ]),

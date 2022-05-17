@@ -10,8 +10,15 @@ class CategoryScreen extends StatefulWidget {
 class _CategoryScreenState extends State<CategoryScreen> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Text('CategoryScreen'),
+    return Scaffold(
+      body: FutureBuilder(
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          return Container(
+            child: Text('dsa'),
+          );
+        },
+
+      ),
     );
   }
 }
